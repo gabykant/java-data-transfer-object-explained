@@ -34,7 +34,7 @@ We will use maven:
 - To run on PORT 9025 (You can change to whatever you want but be sure it's not already used by another program): _mvn exec:java -Dexec.mainClass="com.ksoft.App" -Dserver.port=9025_
 
 ## Project structure and packages
-com.ksoft.controllers.ProjectController.java is the entry point of our api. This is made possible by the _@RestController_ annotation
+- Class com.ksoft.controllers.ProjectController.java is the entry point of our api. This is made possible by the _@RestController_ annotation
 ```
 @RestController
 @RequestMapping("/api/products")
@@ -53,6 +53,32 @@ public class ProjectController {
     @ResponseBody
     public ProductDTO recordProduct(@RequestBody ProductDTO productDTO) {
         return this.productService.saveProduct(productDTO);
+    }
+}
+```
+- Service com.ksoft.services.ProjectService.java. We use the service to well ogranize our code. All the logics reside inside the service. This approach gives more flexibility and code is easy to maintain.
+```
+@Service
+public class ProductService {
+
+    private final ProductRepository productRepository;
+    private final Mapper mapper;
+
+    public ProductService(ProductRepository productRepository, Mapper mapper) {
+        this.productRepository = productRepository;
+        this.mapper = mapper;
+    }
+
+    public List<ProductDTO> getAllProducts() {
+        return productRepository.findAll()
+            .stream()
+            .map(mapper::toProductDTO)
+            .collect(Collectors.toList());
+    }
+
+    public ProductDTO saveProduct(ProductDTO p) {
+        Product product = this.mapper.toProduct(p);
+        return this.mapper.toProductDTO(productRepository.save(product));
     }
 }
 ```
