@@ -12,11 +12,47 @@ Key benefits include:
 ## Typical example
 In this project, we create a web service to record and retrieve products from a database.
 A product is represented by this structure:
-```Product
-id
-name
-description
-price
+
+```
+{
+    id,
+    name,
+    description,
+    price
+}
 ```
 
-We will use maven to create, build and run this code
+The endpoint to save and retrieve data:
+
+```
+GET: /api/products
+POST: /api/products
+```
+
+We will use maven:
+- To build: _mvn clean package_ 
+- To run on PORT 9025 (You can change to whatever you want but be sure it's not already used by another program): _mvn exec:java -Dexec.mainClass="com.ksoft.App" -Dserver.port=9025_
+
+## Project structure and packages
+com.ksoft.controllers.ProjectController.java is the entry point of our api. This is made possible by the _@RestController_ annotation
+```
+@RestController
+@RequestMapping("/api/products")
+@AllArgsConstructor
+public class ProjectController {
+
+    private final ProductService productService;
+
+    @GetMapping
+    @ResponseBody
+    public List<ProductDTO> products() {
+        return this.productService.getAllProducts();
+    }
+
+    @PostMapping
+    @ResponseBody
+    public ProductDTO recordProduct(@RequestBody ProductDTO productDTO) {
+        return this.productService.saveProduct(productDTO);
+    }
+}
+```
